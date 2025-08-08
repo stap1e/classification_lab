@@ -95,13 +95,13 @@ get_bluename = [x for x, flag in zip(need_name, blueif) if flag]
 
 
 # get lab1 data
-# in 160 but not in nse use name=纪淑贞, id= s668982-0002-00002-000001
+# in 160 but not in nse use 
 lab1_name = [x for x in match_name if x in nse_use_name]
 lab1_id   = [id for name, id in zip(match_name, match_id) if name in lab1_name]
 
 
 # get lab2 data
-# in 114 but not in nse use name=['孙文姬', '汪九如', '王炳安', '范玉珍', '赵庆书', '马宁', '陈青岚', '董秀珍', '胡龙凤', '李来青', '陈志明', '景宝峰', '王艳艳']
+# in 114 but not in nse use 
 lab2_name = [x for x in get_bluename if x in nse_use_name]
 # lab2_if   = [id for name, id in zip()]
 
