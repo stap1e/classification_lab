@@ -16,7 +16,7 @@ from utils.util import get_next_result_folder,  save_results, calculate_metrics
 
 
 def main():
-    nseif = False
+    nseif = True
 
     data_train_path = 'D:/thrid_beijing_hospital_data/0804lab1-train.xlsx'
     data_test_path  = 'D:/thrid_beijing_hospital_data/0804lab1-test.xlsx'
@@ -141,7 +141,7 @@ def main():
     npv_scores = []
     auc_scores = []
     selected_features_all = []
-    save_path = os.path.join(base_dir, 'roc_curve_{}_time_{}_{}_{}'.format(mode, ct_mode, lab_describe, datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
+    save_path = os.path.join(result_folder, 'roc_curve_{}_time_{}_{}_{}'.format(mode, ct_mode, lab_describe, datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
     os.makedirs(save_path, exist_ok=True)
     random_states = 1307
 
@@ -225,6 +225,7 @@ def main():
     print(f"精确率 (PPV): {final_Precision:.3f} ± {np.std(precision_scores):.3f}")
     print(f"阴性预测值 (NPV): {final_NPV:.3f}  ± {np.std(npv_scores):.3f}")
     print(f"AUC值: {final_AUC:.3f} ± {np.std(auc_scores):.3f}")
+    print(f"classifier is: {mode}")
 
     final_results = {
         'Recall': f"{final_Recall:.3f} ± {np.std(recall_scores):.3f}",
