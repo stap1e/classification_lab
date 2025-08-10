@@ -43,6 +43,8 @@ save_mid_path        = "D:/thrid_beijing_hospital_data/split_mid.xlsx"
 need_path            = 'D:/thrid_beijing_hospital_data/0804数据-新增12小时内统计结果.xlsx'
 lab2_error_path      = 'D:/thrid_beijing_hospital_data/error.xlsx'
 lab2_nameid_path     = 'D:/thrid_beijing_hospital_data/0805-ct.xlsx'
+lab1_old_path        = 'D:/thrid_beijing_hospital_data/0728data_withCTid.xlsx'
+lab1_save_path       = 'D:/thrid_beijing_hospital_data/0804lab1-CTdata_withCTidname_nse.xlsx'
 save_train_test_path = 'D:/thrid_beijing_hospital_data/0808data/train_test.xlsx'
 save_fordoctor_path  = 'D:/thrid_beijing_hospital_data/0808data/train_test_withname_Bytime.xlsx'
 
@@ -98,11 +100,26 @@ get_bluename = [x for x, flag in zip(need_name, blueif) if flag]
 # in 160 but not in nse use 
 lab1_name = [x for x in match_name if x in nse_use_name]
 lab1_id   = [id for name, id in zip(match_name, match_id) if name in lab1_name]
+lab1_old_data = pd.read_excel(lab1_old_path)
+lab1_new_data = lab1_old_data[lab1_old_data['CTid'].isin(lab1_id)]
+lab1_nse_data = nse_use_data[nse_use_data['姓名（标绿的排除）'].isin(lab1_name)][['姓名（标绿的排除）', 'nse极值', 'nse极值差']]
+# lab1_new_data.to_excel(lab1_save_path, index=False)
+# lab1_nse_data.to_excel(lab1_nsesave_path, index=False)
+
+# align nse and ctdata
+lab1_nameid = pd.DataFrame({'CTid': lab1_id, 'name': lab1_name})
+lab1_nse_data_align = lab1_nameid.merge(lab1_nse_data, left_on='name', right_on='姓名（标绿的排除）', how='left')
+lab1_nse_data_align = lab1_nse_data_align.drop('姓名（标绿的排除）', axis=1)
+
+lab1_nse_ct_data = lab1_new_data.merge(lab1_nse_data_align, on='CTid', how='left')
+lab1_nse_ct_data.to_excel(lab1_save_path, index=False)
 
 
 # get lab2 data
 # in 114 but not in nse use 
-lab2_name = [x for x in get_bluename if x in nse_use_name]
-# lab2_if   = [id for name, id in zip()]
+lab2_name_needed = [x for x in get_bluename if x in nse_use_name]
+lab2_name_geted  = [name for name, id in zip(lab2_all_name, lab2_all_id) if id in ct_use_id]
+lab2_name_withnse = [x for x in lab2_name_geted if x in nse_use_name]
+
 
 print(f"a")
