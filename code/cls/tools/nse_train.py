@@ -15,7 +15,7 @@ from sklearn.svm import SVC
 from lightgbm import LGBMClassifier
 from catboost import CatBoostClassifier
 
-from classify import get_importantfeature_xgb, get_next_result_folder, save_results, calculate_metrics
+from code.cls.tools.classify import get_importantfeature_xgb, get_next_result_folder, save_results, calculate_metrics
 
 def main():
     t0_train_path = "D:/PycharmProject/classification/t0_ctfeatures_all_train.xlsx"
