@@ -16,7 +16,7 @@ from utils.util import get_next_result_folder,  save_results, calculate_metrics
 
 
 def main():
-    nseif = True
+    nseif = False
 
     data_train_path = 'D:/thrid_beijing_hospital_data/0804lab1-train.xlsx'
     data_test_path  = 'D:/thrid_beijing_hospital_data/0804lab1-test.xlsx'
@@ -24,8 +24,8 @@ def main():
     ct_mode = data_train_path.split('-')[0].split('/')[-1]
     data_train = pd.read_excel(data_train_path)
     data_test  = pd.read_excel(data_test_path)
-    lab_describe = 'cpc1-2=0_cpc3-5=1_lab1'
     if nseif:
+        lab_describe = f'cpc1-2=0_cpc3-5=1_lab1_withnse'
         train_nse = data_train[['nse极值', 'nse极值差']]
         test_nse = data_test[['nse极值', 'nse极值差']]
         data_train = data_train.drop(columns=['CTid', 'name', 'nse极值', 'nse极值差'])
@@ -33,6 +33,7 @@ def main():
     else:
         data_train = data_train.drop(columns=['CTid', 'name'])
         data_test = data_test.drop(columns=['CTid', 'name'])
+        lab_describe = f'cpc1-2=0_cpc3-5=1_lab1_withoutnse'
     
     # without cpc5  ------->  means dead people data
     # train_df1 = train_df1[train_df1['CPC'] != 5]
@@ -159,8 +160,8 @@ def main():
     print(f"data train shape is : {X_train.shape}")
     data_train_lasso, selected_features, best_alphas = lasso_dimension_reduction(data_train)
     if nseif:
-        print(f"with nse data training...")
-        results+=f"with nse data training..."
+        print(f"..........with nse data training...")
+        results+=f"..........with nse data training..."
         data_train_withnse = pd.concat([data_train_lasso, train_nse], axis=1)
         cols = [c for c in data_train_withnse.columns if c != 'label'] + ['label']
         data_train_final = data_train_withnse[cols]
@@ -168,8 +169,9 @@ def main():
         X_test = pd.concat([X_test, test_nse], axis=1)
 
     else:
-        print(f"without nse data training...")
-        results+=f"without nse data training..."
+        print(f"..........without nse data training...")
+        results+=f"..........without nse data training..."
+        data_train_final = data_train_lasso
         X_test = X_test[selected_features]
 
     X_train = data_train_final.iloc[:, :-1] 
