@@ -16,18 +16,23 @@ from utils.util import get_next_result_folder,  save_results, calculate_metrics
 
 
 def main():
+    nseif = True
+
     data_train_path = 'D:/thrid_beijing_hospital_data/0804lab1-train.xlsx'
     data_test_path  = 'D:/thrid_beijing_hospital_data/0804lab1-test.xlsx'
-    base_dir = 'D:/thrid_beijing_hospital_data/results_0804_lab1'
+    base_dir        = 'D:/thrid_beijing_hospital_data/results_0804_lab1'
     ct_mode = data_train_path.split('-')[0].split('/')[-1]
     data_train = pd.read_excel(data_train_path)
     data_test  = pd.read_excel(data_test_path)
     lab_describe = 'cpc1-2=0_cpc3-5=1_lab1'
-    data_train = data_train.drop(columns=['CTid', 'name'])
-    train_nse = data_train[['nse极值', 'nse极值差']]
-    data_test = data_test.drop(columns=['CTid', 'name'])
-    test_nse = data_test[['nse极值', 'nse极值差']]
-    nseif = True
+    if nseif:
+        train_nse = data_train[['nse极值', 'nse极值差']]
+        test_nse = data_test[['nse极值', 'nse极值差']]
+        data_train = data_train.drop(columns=['CTid', 'name', 'nse极值', 'nse极值差'])
+        data_test = data_test.drop(columns=['CTid', 'name', 'nse极值', 'nse极值差'])
+    else:
+        data_train = data_train.drop(columns=['CTid', 'name'])
+        data_test = data_test.drop(columns=['CTid', 'name'])
     
     # without cpc5  ------->  means dead people data
     # train_df1 = train_df1[train_df1['CPC'] != 5]
@@ -137,8 +142,6 @@ def main():
     selected_features_all = []
     save_path = os.path.join(base_dir, 'roc_curve_{}_time_{}_{}_{}'.format(mode, ct_mode, lab_describe, datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
     os.makedirs(save_path, exist_ok=True)
-
-    metrics_history = {'ACC': [], 'Recall': [], 'Specificity': [], 'Precision': [], 'NPV': [], 'AUC': [], }
     random_states = 1307
 
     results = "lab: {}\nclassifier mode is: {}\n\nrandom_states: {}, train num: {}, test num: {}\n".format(lab_describe, mode, random_states, len(data_train), len(data_test))
@@ -158,21 +161,21 @@ def main():
     if nseif:
         print(f"with nse data training...")
         results+=f"with nse data training..."
-        data_train_lasso = pd.concat([data_train_lasso, train_nse], axis=1)
-        cols = [c for c in data_train_lasso.columns if c != 'label'] + ['label']
-        data_train_final = data_train_lasso[cols]
+        data_train_withnse = pd.concat([data_train_lasso, train_nse], axis=1)
+        cols = [c for c in data_train_withnse.columns if c != 'label'] + ['label']
+        data_train_final = data_train_withnse[cols]
+        X_test = X_test[selected_features]
+        X_test = pd.concat([X_test, test_nse], axis=1)
 
     else:
         print(f"without nse data training...")
         results+=f"without nse data training..."
+        X_test = X_test[selected_features]
 
-    X_train = data_train_lasso.iloc[:, :-1] 
-    y_train = data_train_lasso.iloc[:, -1]
+    X_train = data_train_final.iloc[:, :-1] 
+    y_train = data_train_final.iloc[:, -1]
     print(f"data train shape is : {X_train.shape}")
-
-
     print(f"data selected features num is : {len(selected_features)}")
-    X_test = X_test[selected_features]
 
     t = if_same(X_train, X_test)
     if t:
