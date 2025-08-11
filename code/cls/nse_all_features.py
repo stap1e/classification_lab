@@ -1,3 +1,4 @@
+# process nse feature(get name to align ctid and nse feature)
 import pandas as pd
 
 i_list = ['CPC', 'CTid']

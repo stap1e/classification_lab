@@ -4,7 +4,7 @@ import os
 from utils.pre4data import drop_columns
 from sklearn.model_selection import train_test_split
 
-
+# set data path
 data0_path = './0721/result_0.xlsx'
 data1_path = './0721/result_1_n.xlsx'
 data2_path = './0721/result_2.xlsx'
@@ -29,6 +29,8 @@ data2_3 = pd.read_excel(data2_path, sheet_name=3)
 
 # data_1 = pd.concat([data0_1, data1_1, data2_1, data3_1])
 data_1 = pd.concat([data0_1, data1_1, data2_1])
+
+# dropdata and dropdata0 是不需要的特征, 且这些特征在进行降维时的值会导致无法读取, 字符串类型或者其他不可使用的类型
 dropdata = ['diagnostics_Image-original_Hash', 'diagnostics_Imag e-original_Hash_1', 'diagnostics_Image-original_Hash_2', 'diagnostics_Image-original_Hash_3',
             'diagnostics_Mask-original_Hash', 'diagnostics_Mask-original_Hash_1', 'diagnostics_Mask-original_Hash_2', 'diagnostics_Mask-original_Hash_3',
             'diagnostics_Image-original_Spacing', 'diagnostics_Image-original_Spacing_1', 'diagnostics_Image-original_Spacing_2','diagnostics_Image-original_Spacing_3',
