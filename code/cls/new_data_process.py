@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 
+from config.feature_columns import RADIOMICS_DROP_COLUMNS
 from utils.pre4data import drop_columns
 from sklearn.model_selection import train_test_split
 
@@ -30,29 +31,8 @@ data2_3 = pd.read_excel(data2_path, sheet_name=3)
 # data_1 = pd.concat([data0_1, data1_1, data2_1, data3_1])
 data_1 = pd.concat([data0_1, data1_1, data2_1])
 
-# dropdata and dropdata0 是不需要的特征, 且这些特征在进行降维时的值会导致无法读取, 字符串类型或者其他不可使用的类型
-dropdata = ['diagnostics_Image-original_Hash', 'diagnostics_Imag e-original_Hash_1', 'diagnostics_Image-original_Hash_2', 'diagnostics_Image-original_Hash_3',
-            'diagnostics_Mask-original_Hash', 'diagnostics_Mask-original_Hash_1', 'diagnostics_Mask-original_Hash_2', 'diagnostics_Mask-original_Hash_3',
-            'diagnostics_Image-original_Spacing', 'diagnostics_Image-original_Spacing_1', 'diagnostics_Image-original_Spacing_2','diagnostics_Image-original_Spacing_3',
-            'diagnostics_Image-original_Size', 'diagnostics_Image-original_Size_1', 'diagnostics_Image-original_Size_2', 'diagnostics_Image-original_Size_3',
-            'diagnostics_Mask-original_Spacing', 'diagnostics_Mask-original_Spacing_1', 'diagnostics_Mask-original_Spacing_2', 'diagnostics_Mask-original_Spacing_3',
-            'diagnostics_Mask-original_Size', 'diagnostics_Mask-original_Size_1', 'diagnostics_Mask-original_Size_2', 'diagnostics_Mask-original_Size_3',
-            'diagnostics_Mask-original_BoundingBox', 'diagnostics_Mask-original_BoundingBox_1', 'diagnostics_Mask-original_BoundingBox_2', 'diagnostics_Mask-original_BoundingBox_3',
-            'diagnostics_Mask-original_CenterOfMassIndex', 'diagnostics_Mask-original_CenterOfMassIndex_1', 'diagnostics_Mask-original_CenterOfMassIndex_2', 'diagnostics_Mask-original_CenterOfMassIndex_3',
-            'diagnostics_Mask-original_CenterOfMass', 'diagnostics_Mask-original_CenterOfMass_1', 'diagnostics_Mask-original_CenterOfMass_2', 'diagnostics_Mask-original_CenterOfMass_3',
-            'diagnostics_Mask-original_BoundingBox.1', 'diagnostics_Mask-original_BoundingBox.1_1', 'diagnostics_Mask-original_BoundingBox.1_2', 'diagnostics_Mask-original_BoundingBox.1_3',  
-            'diagnostics_Mask-original_BoundingBox', 'diagnostics_Mask-original_BoundingBox_1', 'diagnostics_Mask-original_BoundingBox_2', 'diagnostics_Mask-original_BoundingBox_3',
-            'CPC_1', 'CPC_2', 'CPC_3', 'CTid_1', 'CTid_2', 'CTid_3', 'name_1', 'name_2', 'name_3',
-            'diagnostics_Mask-corrected_Spacing', 'diagnostics_Mask-corrected_Size', 'diagnostics_Mask-corrected_BoundingBox', 'diagnostics_Mask-corrected_VoxelNum',
-            'diagnostics_Mask-corrected_VolumeNum','diagnostics_Mask-corrected_CenterOfMassIndex',
-            'diagnostics_Mask-corrected_CenterOfMass', 'diagnostics_Mask-corrected_Mean', 'diagnostics_Mask-corrected_Minimum',
-            'diagnostics_Mask-corrected_Maximum', 'live', 'diagnostics_Versions_PyRadiomics', 'diagnostics_Versions_Numpy', 'diagnostics_Versions_SimpleITK', 'diagnostics_Versions_PyWavelet',
-            'diagnostics_Versions_Python', 'diagnostics_Configuration_Settings', 'diagnostics_Configuration_EnabledImageTypes', 'diagnostics_Image-original_Dimensionality']
-
-dropdata0 = ['diagnostics_Mask-corrected_Spacing', 'diagnostics_Mask-corrected_Size', 'diagnostics_Mask-corrected_BoundingBox', 
-             'diagnostics_Mask-corrected_VoxelNum', 'diagnostics_Mask-corrected_VolumeNum', 
-             'diagnostics_Mask-corrected_CenterOfMassIndex', 'diagnostics_Mask-corrected_CenterOfMass', 
-             'diagnostics_Mask-corrected_Mean', 'diagnostics_Mask-corrected_Minimum', 'diagnostics_Mask-corrected_Maximum', 'live']
+# 不需要的 diagnostics / 元数据列（见 config/feature_columns.py）
+dropdata = RADIOMICS_DROP_COLUMNS
 
 data0_1 = drop_columns(data0_1, dropdata)
 data1_1 = drop_columns(data1_1, dropdata)
