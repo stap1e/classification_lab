@@ -143,31 +143,21 @@ def run_experiment(config: ExperimentConfig) -> str:
     split_logs: list[str] = []
 
     if config.n_folds > 1:
+        # Split raw rows (keep CPC + NSE + CTid) so each fold can run full preprocessing.
         full_raw = load_excel(config.train_path)
-        full_labeled = prepare_labeled_frames(
-            full_raw,
-            full_raw,
-            use_nse=config.use_nse,
-            exclude_cpc5=config.exclude_cpc5,
-            bins=config.cpc_bins,
-            labels=config.cpc_labels,
-        )[0]
-        X = full_labeled.drop(columns=["label"])
-        y = full_labeled["label"]
+        if config.exclude_cpc5:
+            full_raw = full_raw[full_raw["CPC"] != 5].copy()
 
         for fold in range(1, config.n_folds + 1):
             print(f"============== Fold {fold} ==============")
             rs = config.fold_random_states[fold - 1]
-            X_tr, X_te, y_tr, y_te = train_test_split(
-                X,
-                y,
+            train_fold, test_fold = train_test_split(
+                full_raw,
                 test_size=config.test_size,
-                stratify=y,
+                stratify=full_raw["CPC"],
                 shuffle=True,
                 random_state=rs,
             )
-            train_fold = pd.concat([X_tr, y_tr], axis=1)
-            test_fold = pd.concat([X_te, y_te], axis=1)
             metrics, features, log = _run_single_fold(
                 train_fold,
                 test_fold,

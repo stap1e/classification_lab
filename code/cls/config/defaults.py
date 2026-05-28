@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from pathlib import Path
 from typing import Literal, Sequence
 
@@ -45,7 +45,20 @@ class ExperimentConfig:
     cpc_labels: tuple[int, int] = CPC_LABELS
 
     def resolve_paths(self) -> None:
-        self.train_path = Path(self.train_path)
+        self.train_path = Path(self.train_path).expanduser()
         if self.test_path is not None:
-            self.test_path = Path(self.test_path)
-        self.results_base_dir = Path(self.results_base_dir)
+            self.test_path = Path(self.test_path).expanduser()
+        self.results_base_dir = Path(self.results_base_dir).expanduser()
+
+    @classmethod
+    def from_mapping(cls, data: dict) -> ExperimentConfig:
+        """Build config from a YAML profile dict (unknown keys ignored)."""
+        field_names = {f.name for f in fields(cls)}
+        kwargs = {k: v for k, v in data.items() if k in field_names and v is not None}
+        if "fold_random_states" in kwargs:
+            kwargs["fold_random_states"] = tuple(kwargs["fold_random_states"])
+        if "cpc_bins" in kwargs:
+            kwargs["cpc_bins"] = tuple(kwargs["cpc_bins"])
+        if "cpc_labels" in kwargs:
+            kwargs["cpc_labels"] = tuple(kwargs["cpc_labels"])
+        return cls(**kwargs)

@@ -1,0 +1,62 @@
+# 实验配置：路径与超参外置
+#
+# 路径占位符：
+#   {data_root}、{results_root} — 来自下方 paths（支持环境变量展开）
+#   ${CLS_DATA_ROOT:-./data}   — 直接写环境变量亦可
+#
+# 环境变量（推荐）：
+#   CLS_DATA_ROOT     数据目录（Excel）
+#   CLS_RESULTS_ROOT  结果输出根目录
+#   CLS_EXPERIMENT    默认 profile 名（可被 --profile 覆盖）
+#
+# 示例（Windows）：
+#   set CLS_DATA_ROOT=D:\thrid_beijing_hospital_data
+#   set CLS_RESULTS_ROOT=D:\thrid_beijing_hospital_data
+
+paths:
+  data_root: ${CLS_DATA_ROOT:-./data}
+  results_root: ${CLS_RESULTS_ROOT:-./results}
+
+experiments:
+  lab1:
+    train_path: "{data_root}/0804lab1-train.xlsx"
+    test_path: "{data_root}/0804lab1-test.xlsx"
+    results_base_dir: "{results_root}/results_0804_lab1"
+    lab_describe: cpc1-2=0_cpc3-5=1_lab1
+    use_nse: true
+    classifier: svm
+    n_folds: 1
+    random_state: 42
+
+  single:
+    train_path: "{data_root}/0804data_0.xlsx"
+    test_path: null
+    results_base_dir: "{results_root}/results_single"
+    lab_describe: cpc1-2=0_cpc3-5=1
+    use_nse: false
+    classifier: svm
+    n_folds: 1
+    test_size: 0.2
+    random_state: 42
+
+  kfold:
+    train_path: "{data_root}/0728data_delete.xlsx"
+    test_path: null
+    results_base_dir: "{results_root}/results_kfold"
+    lab_describe: cpc1-2=0_cpc3-5=1_kfold
+    use_nse: false
+    classifier: svm
+    n_folds: 5
+    test_size: 0.2
+    fold_random_states: [3, 13, 42, 87, 1307]
+
+  kfold_nse:
+    train_path: "{data_root}/0804lab1-CTdata_withCTidname_nse.xlsx"
+    test_path: null
+    results_base_dir: "{results_root}/results_kfold_nse"
+    lab_describe: cpc1-2=0_cpc3-5=1_kfold_nse
+    use_nse: true
+    classifier: svm
+    n_folds: 5
+    test_size: 0.2
+    fold_random_states: [3, 13, 42, 87, 1307]

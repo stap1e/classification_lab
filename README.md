@@ -15,7 +15,10 @@ code/cls/
 │   └── tools/        # 数据对齐、NSE 处理等脚本
 ├── classify_lab1.py  # 固定 train/test + 可选 NSE（lab1）
 ├── classify_single.py# 单文件划分 train/test
-├── classify_kfold.py # 5 折交叉验证
+├── classify_kfold.py # 5 折交叉验证（无 NSE）
+├── classify_kfold_nse.py # 5 折 + NSE
+├── run_experiment.py # 统一 CLI（任意 profile）
+├── config/experiments.yaml # 路径与实验配置（外置）
 ├── feature_process.py# 特征表合并与清洗（数据预处理）
 ├── new_data_process.py
 ├── train_test.py     # 划分并导出 train/test Excel
@@ -29,28 +32,60 @@ cd code/cls
 pip install -r requirements.txt
 ```
 
-## 运行实验
+## 配置路径（YAML + 环境变量）
 
-在 `code/cls` 目录下执行（保证 `config`、`pipeline` 可被导入）：
+所有实验参数集中在 `code/cls/config/experiments.yaml`。路径使用占位符，无需改 Python 代码：
 
-**Lab1：固定训练/测试集，可选 NSE**
+| 变量 | 含义 | 默认值 |
+|------|------|--------|
+| `CLS_DATA_ROOT` | Excel 数据目录 | `./data` |
+| `CLS_RESULTS_ROOT` | 结果输出根目录 | `./results` |
+| `CLS_EXPERIMENT` | 默认 profile | 各入口脚本不同 |
 
-```bash
+YAML 内可使用 `{data_root}/文件名.xlsx`，或 `${CLS_DATA_ROOT:-./data}/文件名.xlsx`。
+
+**Windows 示例**
+
+```bat
+set CLS_DATA_ROOT=D:\thrid_beijing_hospital_data
+set CLS_RESULTS_ROOT=D:\thrid_beijing_hospital_data
 python classify_lab1.py
 ```
 
-在脚本内修改 `ExperimentConfig` 中的 `train_path`、`test_path`、`results_base_dir`、`use_nse`、`classifier`。
-
-**单表随机划分**
+**Linux / macOS 示例**
 
 ```bash
-python classify_single.py
+export CLS_DATA_ROOT=/path/to/your/data
+export CLS_RESULTS_ROOT=/path/to/your/results
+python run_experiment.py -p kfold_nse
 ```
 
-**5 折交叉验证**
+查看可用 profile：
 
 ```bash
+python run_experiment.py --list-profiles
+```
+
+| Profile | 说明 |
+|---------|------|
+| `lab1` | 固定 train/test，含 NSE |
+| `single` | 单表 8:2 分层划分 |
+| `kfold` | 5 折交叉验证（仅 CT 特征） |
+| `kfold_nse` | 5 折 + NSE（每折独立 LASSO 与 NSE 拼接） |
+
+修改或新增实验：编辑 `config/experiments.yaml` 中 `experiments` 节点，或复制一份自定义 YAML 并用 `-c` 指定。
+
+## 运行实验
+
+在 `code/cls` 目录下执行：
+
+```bash
+pip install -r requirements.txt
+python classify_lab1.py          # 等同: python run_experiment.py -p lab1
+python classify_single.py
 python classify_kfold.py
+python classify_kfold_nse.py       # 5 折 + NSE
+python run_experiment.py -p lab1 -c config/experiments.yaml
 ```
 
 ### 可选分类器
@@ -75,4 +110,4 @@ python classify_kfold.py
 | `feature_process.py` / `new_data_process.py` | 院内数据流水线（需配置本地 Excel 路径） |
 | `utils/tools/*` | CTid–姓名–NSE 对齐等 |
 
-路径默认为历史 Windows 绝对路径，请按本机数据位置修改各脚本顶部的路径常量，或后续改为环境变量 / YAML 配置。
+预处理脚本（`feature_process.py`、`utils/tools/*`）仍可能含历史绝对路径；建议同样改为读取 `CLS_DATA_ROOT` 或从 `config/experiments.yaml` 的 `paths` 段复制路径约定。
