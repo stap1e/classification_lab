@@ -36,8 +36,6 @@ def calculate_metrics(y_true, y_pred, y_prob, save_roc_path=None, mode=None, fol
             plt.savefig(os.path.join(save_roc_path, 'model-{}'.format(mode)), dpi=300, bbox_inches='tight')
         plt.close()
 
-    
-    roc_auc = roc_auc_score(y_true, y_prob) if y_prob is not None else None
     return ACC, Recall, Specificity, Precision, NPV, roc_auc
 
 
